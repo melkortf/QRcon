@@ -52,6 +52,16 @@ class __QRconApi__ QRconSession : public QObject {
      */
     Q_PROPERTY(quint32 port READ port WRITE setPort)
     
+public:
+    /**
+     * The \c Error enum describes an error that happened during working with
+     * the RCON session.
+     */
+    enum Error {
+        AuthenticationFailed /**< Indicates the wrong RCON authentication */,
+        Disconnected /**< The connection with RCON host is lost */
+    };
+    
 signals:
     /**
      * Emitted when user is authenticated successfully.
@@ -62,6 +72,11 @@ signals:
      * Emitted when server sends a response to any command.
      */
     void replied(QString body);
+    
+    /**
+     * Emitted when an error occurs.
+     */
+    void error(Error error);
 
 public:
     /**
@@ -103,7 +118,6 @@ private slots:
     void authenticateImpl();
     void readRcon();
     void handleError(QAbstractSocket::SocketError error);
-    void handleStateChange(QAbstractSocket::SocketState state);
     
 private:
     QString m_hostName;

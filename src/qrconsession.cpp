@@ -20,6 +20,7 @@
 #include "qrconsession.h"
 #include <QtNetwork>
 #include <cstring>
+#include <functional>
 
 constexpr auto SERVERDATA_AUTH = 3;
 constexpr auto SERVERDATA_EXECCOMMAND = 2;
@@ -33,7 +34,6 @@ QRconSession::QRconSession(QObject* parent) :
 {   
     connect(m_socket, &QAbstractSocket::readyRead, this, &QRconSession::readRcon);
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
-    connect(m_socket, &QAbstractSocket::stateChanged, this, &QRconSession::handleStateChange);
     connect(m_socket, &QAbstractSocket::connected, this, &QRconSession::authenticateImpl);
 }
 
@@ -83,7 +83,8 @@ void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QByteArray& 
             emit authenticated();
         }
     } else if (id == -1) {
-        qFatal("Authentication failed!");
+        qDebug("Authentication failed!");
+        emit error(AuthenticationFailed);
     } else if (type == SERVERDATA_RESPONSE_VALUE) {
         emit replied(QString(body));
     }
@@ -111,6 +112,8 @@ void QRconSession::authenticateImpl()
 {
     qDebug("Using password: %s", qPrintable(password()));
     
+    connect(m_socket, &QAbstractSocket::disconnected, std::bind(&QRconSession::error, this, Disconnected));
+    
     QByteArray packet = makePacket(SERVERDATA_AUTH, password());
     m_authId = m_id;
     m_socket->write(packet);
@@ -137,41 +140,7 @@ void QRconSession::readRcon()
 
 void QRconSession::handleError(QAbstractSocket::SocketError error)
 {
-    qFatal("Jest error....");
+    /* TODO Handle me please */
+    Q_UNUSED(error);
 }
 
-void QRconSession::handleStateChange(QAbstractSocket::SocketState state)
-{
-    QString stateStr;
-    switch (state) {
-        case QAbstractSocket::UnconnectedState:
-            stateStr = "not connected";
-            break;
-            
-        case QAbstractSocket::HostLookupState:
-            stateStr = "host lookup";
-            break;
-            
-        case QAbstractSocket::ConnectingState:
-            stateStr = "connecting";
-            break;
-            
-        case QAbstractSocket::ConnectedState:
-            stateStr = "established";
-            break;
-            
-        case QAbstractSocket::BoundState:
-            stateStr = "bound";
-            break;
-            
-        case QAbstractSocket::ClosingState:
-            stateStr = "closing";
-            break;
-            
-        case QAbstractSocket::ListeningState:
-            stateStr = "listening";
-            break;
-    }
-    
-    qDebug("State: %s", qPrintable(stateStr));
-}
