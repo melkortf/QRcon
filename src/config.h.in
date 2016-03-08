@@ -1,0 +1,6 @@
+#ifndef QRCON_CONFIG_H
+#define QRCON_CONFIG_H
+
+#define QRCON_VERSION "${qrcon_VERSION}"
+
+#endif // QRCON_CONFIG_H
