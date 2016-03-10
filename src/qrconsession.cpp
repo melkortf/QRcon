@@ -18,6 +18,7 @@
  */
 
 #include "qrconsession.h"
+#include "qrconcommand.h"
 #include <QtNetwork>
 #include <cstring>
 #include <functional>
@@ -57,6 +58,13 @@ void QRconSession::command(const QString& command)
     m_socket->write(packet);
 }
 
+void QRconSession::command(QRconCommand* command)
+{
+    m_commands << command;
+    command->commandId = m_id + 1;
+    this->command(command->command()); // wtf is that construction
+}
+
 void QRconSession::setHostName(const QString& hostName)
 {
     m_hostName = hostName;
@@ -86,7 +94,13 @@ void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QByteArray& 
         qDebug("Authentication failed!");
         emit error(AuthenticationFailed);
     } else if (type == SERVERDATA_RESPONSE_VALUE) {
-        emit replied(QString(body));
+        auto it = std::find_if(m_commands.begin(), m_commands.end(), [id](auto it) {
+            return it->commandId == id;
+        });
+        
+        if (it != m_commands.end()) {
+            (*it)->replyReceived(body);
+        }
     }
     
     Q_UNUSED(body);

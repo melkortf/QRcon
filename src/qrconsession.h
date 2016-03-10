@@ -24,6 +24,8 @@
 #include <QtCore/QObject>
 #include <QtNetwork/QTcpSocket>
 
+class QRconCommand;
+
 /**
  * \ingroup QRcon
  * @{
@@ -69,11 +71,6 @@ signals:
     void authenticated();
     
     /**
-     * Emitted when server sends a response to any command.
-     */
-    void replied(QString body);
-    
-    /**
      * Emitted when an error occurs.
      */
     void error(Error error);
@@ -101,6 +98,11 @@ public:
      */
     void command(const QString& command);
     
+    /**
+     * Executes the command and stores the reply in it.
+     */
+    void command(QRconCommand* command);
+    
     const QString& hostName() const { return m_hostName; }
     void setHostName(const QString& hostName);
     const QString& password() const { return m_password; }
@@ -127,7 +129,8 @@ private:
     quint32 m_id = 0; /* Packet counter */
     quint32 m_authId = 0; /* ID of the auth packet */
     int m_authenticated = 0; /* 0, 1 - not authenticated, 2 - authenticated */
+    QList<QRconCommand*> m_commands; /* List of pending commands */
     
-};
+}; /** @} */
 
 #endif // QRCONSESSION_H

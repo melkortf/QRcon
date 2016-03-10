@@ -73,8 +73,8 @@ if (NOT qrcon_VERSION)
         # shorten the sha
         string (SUBSTRING "${GIT_SHA1}" 0 10 GIT_HASH)
         set (qrcon_VERSION ${qrcon_VERSION}-${GIT_HASH}-git)
-    endif (NOT "${GIT_SHA1}" STREQUAL "GITDIR-NOTFOUND")
-endif (NOT qrcon_VERSION)
+    endif ()
+endif ()
 
 set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

@@ -16,12 +16,15 @@ include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 set (qrcon_SOURCES
+    qrconcommand.cpp
     qrconsession.cpp
 )
 
 set (qrcon_HEADERS
+    qrconcommand.h
     qrconsession.h
 
+    qrcon.h
     qrconexport.h
 )
 
@@ -30,7 +33,10 @@ target_link_libraries (qrcon Qt5::Core Qt5::Network)
 set_target_properties (qrcon PROPERTIES CXX_VISIBILITY_PRESET hidden)
 install (TARGETS qrcon
     RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib/qrcon
+    LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     CONFIGURATIONS Release
+)
+install (FILES ${qrcon_HEADERS}
+    DESTINATION include/qrcon
 )
