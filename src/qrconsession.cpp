@@ -62,6 +62,7 @@ void QRconSession::command(QRconCommand* command)
 {
     m_commands << command;
     command->commandId = m_id + 1;
+    command->clear();
     this->command(command->command()); // wtf is that construction
 }
 
@@ -80,7 +81,7 @@ void QRconSession::setPort(quint32 port)
     m_port = port;
 }
 
-void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QByteArray& body)
+void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QString& body)
 {
     if (id == static_cast<qint32>(m_authId)) {
         if (type == SERVERDATA_RESPONSE_VALUE || type == SERVERDATA_AUTH_RESPONSE) {
@@ -100,6 +101,7 @@ void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QByteArray& 
         
         if (it != m_commands.end()) {
             (*it)->replyReceived(body);
+            (*it)->finish();
         }
     }
     
@@ -135,21 +137,29 @@ void QRconSession::authenticateImpl()
 
 void QRconSession::readRcon()
 {
-    qDebug("%lld bytes available", m_socket->bytesAvailable());
+    QDataStream stream(m_socket);
+    stream.setByteOrder(QDataStream::LittleEndian);
     
-    do {
-        qint32 length, id, type;
-        qint64 bytes = m_socket->read(reinterpret_cast<char*>(&length), 4);
-        Q_ASSERT(bytes == 4);
-        bytes = m_socket->read(reinterpret_cast<char*>(&id), 4);
-        Q_ASSERT(bytes == 4);
-        bytes = m_socket->read(reinterpret_cast<char*>(&type), 4);
-        Q_ASSERT(bytes == 4);
+    while (m_socket->bytesAvailable() > 0) {
+        if (m_length == 0) {
+            if (m_socket->bytesAvailable() < 4)
+                return;
+            
+            stream >> m_length;
+        }
         
-        QByteArray body = m_socket->read(length - 8);
-        rconPacketReceived(id, type, body);
+        if (m_socket->bytesAvailable() < m_length)
+            return;
         
-    } while (m_socket->bytesAvailable() >= 14); // 14 is minimum packet size
+        qint32 id, type;
+        stream >> id >> type;
+        
+        QByteArray body(m_length - 8, '\0');
+        stream.readRawData(body.data(), m_length - 8);
+        
+        rconPacketReceived(id, type, QString(body));
+        m_length = 0;
+    }
 }
 
 void QRconSession::handleError(QAbstractSocket::SocketError error)

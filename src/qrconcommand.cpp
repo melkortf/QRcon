@@ -24,8 +24,17 @@ QRconCommand::QRconCommand(const QString& command, QObject* parent) :
     QObject(parent),
     m_command(command) {}
 
-void QRconCommand::replyReceived(const QByteArray& body)
+void QRconCommand::clear()
 {
-    m_body = body;
+    m_body.clear();
+}
+
+void QRconCommand::replyReceived(const QString& body)
+{
+    m_body.append(body);
+}
+
+void QRconCommand::finish()
+{
     emit finished();
 }

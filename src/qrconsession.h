@@ -111,7 +111,7 @@ public:
     void setPort(quint32 port);
     
 protected:
-    virtual void rconPacketReceived(qint32 id, qint32 type, const QByteArray& body);
+    virtual void rconPacketReceived(qint32 id, qint32 type, const QString& body);
     
 private:
     QByteArray makePacket(qint32 packetType, const QString& string);
@@ -130,6 +130,9 @@ private:
     quint32 m_authId = 0; /* ID of the auth packet */
     int m_authenticated = 0; /* 0, 1 - not authenticated, 2 - authenticated */
     QList<QRconCommand*> m_commands; /* List of pending commands */
+    int m_length = 0; /* Used to read RCON packets */
+    QString m_body;
+    
     
 }; /** @} */
 

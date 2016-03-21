@@ -51,15 +51,17 @@ public:
     explicit QRconCommand(const QString& command, QObject* parent = nullptr);
     
     const QString& command() const { return m_command; }
-    const QByteArray& body() const { return m_body; }
+    const QString& body() const { return m_body; }
     
 protected:
-    virtual void replyReceived(const QByteArray& body);
+    void clear();
+    void replyReceived(const QString& body);
+    void finish();
     
 private:
     int commandId;
     QString m_command;
-    QByteArray m_body;
+    QString m_body;
 
 }; /** @} */
 
