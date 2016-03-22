@@ -16,11 +16,13 @@ include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 set (qrcon_SOURCES
+    qcvarcommand.cpp
     qrconcommand.cpp
     qrconsession.cpp
 )
 
 set (qrcon_HEADERS
+    qcvarcommand.h
     qrconcommand.h
     qrconsession.h
 
