@@ -61,7 +61,8 @@ public:
      */
     enum Error {
         AuthenticationFailed /**< Indicates the wrong RCON authentication */,
-        Disconnected /**< The connection with RCON host is lost */
+        Disconnected /**< The connection with RCON host is lost */,
+        Other /**< Other, internal error */
     };
     
 signals:
