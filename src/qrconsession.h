@@ -120,7 +120,7 @@ private:
 private slots:
     void authenticateImpl();
     void readRcon();
-    void handleError(QAbstractSocket::SocketError error);
+    void handleError(QAbstractSocket::SocketError socketError);
     
 private:
     QString m_hostName;

@@ -54,6 +54,9 @@ public:
     const QString& body() const { return m_body; }
     
 protected:
+    /**
+     * Clears the response body, preparing it for a next execution.
+     */
     void clear();
     void replyReceived(const QString& body);
     void finish();

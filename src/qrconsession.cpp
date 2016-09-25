@@ -162,10 +162,10 @@ void QRconSession::readRcon()
     }
 }
 
-void QRconSession::handleError(QAbstractSocket::SocketError error)
+void QRconSession::handleError(QAbstractSocket::SocketError socketError)
 {
     /* TODO Handle errors properly */
-    if (error == QAbstractSocket::RemoteHostClosedError)
+    if (socketError == QAbstractSocket::RemoteHostClosedError)
         emit error(Disconnected);
     else
         emit error(Other);
