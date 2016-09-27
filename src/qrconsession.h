@@ -21,6 +21,7 @@
 #define QRCONSESSION_H
 
 #include "qrconexport.h"
+#include "qrconserverconfig.h"
 #include <QtCore/QObject>
 #include <QtNetwork/QTcpSocket>
 
@@ -103,6 +104,12 @@ public:
      * Executes the command and stores the reply in it.
      */
     void command(QRconCommand* command);
+
+    /**
+     * Sets the \c hostName, \c password and \c port at once, using the
+     * \c config provided.
+     */
+    void setServerConfig(const QRconServerConfig& config);
     
     const QString& hostName() const { return m_hostName; }
     void setHostName(const QString& hostName);

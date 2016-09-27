@@ -66,6 +66,13 @@ void QRconSession::command(QRconCommand* command)
     this->command(command->command()); // wtf is that construction
 }
 
+void QRconSession::setServerConfig(const QRconServerConfig &config)
+{
+    setHostName(config.hostName());
+    setPassword(config.password());
+    setPort(config.port());
+}
+
 void QRconSession::setHostName(const QString& hostName)
 {
     m_hostName = hostName;

@@ -18,12 +18,14 @@ include_directories (${CMAKE_CURRENT_BINARY_DIR})
 set (qrcon_SOURCES
     qcvarcommand.cpp
     qrconcommand.cpp
+    qrconserverconfig.cpp
     qrconsession.cpp
 )
 
 set (qrcon_HEADERS
     qcvarcommand.h
     qrconcommand.h
+    qrconserverconfig.h
     qrconsession.h
 
     qrcon.h
