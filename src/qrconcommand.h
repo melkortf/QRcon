@@ -62,7 +62,7 @@ protected:
     void finish();
     
 private:
-    int commandId;
+    int commandId, verifyId;
     QString m_command;
     QString m_body;
 

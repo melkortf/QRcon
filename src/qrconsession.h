@@ -22,8 +22,9 @@
 
 #include "qrconexport.h"
 #include "qrconserverconfig.h"
-#include <QtCore/QObject>
-#include <QtNetwork/QTcpSocket>
+#include <QObject>
+#include <QPointer>
+#include <QTcpSocket>
 
 class QRconCommand;
 
@@ -96,11 +97,6 @@ public:
     void authenticate();
     
     /**
-     * Issues a single command over the RCON protocol.
-     */
-    void command(const QString& command);
-    
-    /**
      * Executes the command and stores the reply in it.
      */
     void command(QRconCommand* command);
@@ -119,10 +115,10 @@ public:
     void setPort(quint32 port);
     
 protected:
-    virtual void rconPacketReceived(qint32 id, qint32 type, const QString& body);
+    virtual void rconPacketReceived(qint32 id, qint32 type, const QByteArray& body);
     
 private:
-    QByteArray makePacket(qint32 packetType, const QString& string);
+    QByteArray makePacket(qint32 packetType, const QString& string, quint32* id = nullptr);
     
 private slots:
     void authenticateImpl();
@@ -137,7 +133,7 @@ private:
     quint32 m_id = 0; /* Packet counter */
     quint32 m_authId = 0; /* ID of the auth packet */
     int m_authenticated = 0; /* 0, 1 - not authenticated, 2 - authenticated */
-    QList<QRconCommand*> m_commands; /* List of pending commands */
+    QList<QPointer<QRconCommand>> m_commands; /* List of pending commands */
     int m_length = 0; /* Used to read RCON packets */
     QString m_body;
     

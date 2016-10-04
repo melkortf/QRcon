@@ -20,6 +20,7 @@
 #include "qrconsession.h"
 #include "qrconcommand.h"
 #include <QtNetwork>
+#include <algorithm>
 #include <cstring>
 #include <functional>
 
@@ -27,6 +28,11 @@ constexpr auto SERVERDATA_AUTH = 3;
 constexpr auto SERVERDATA_EXECCOMMAND = 2;
 constexpr auto SERVERDATA_AUTH_RESPONSE = 2;
 constexpr auto SERVERDATA_RESPONSE_VALUE = 0;
+
+static const QByteArray PacketEmpty = []() {
+    static qint8 data[] = { 0x0, 0x1, 0x0, 0x0, 0x0, 0x0 };
+    return QByteArray(reinterpret_cast<const char*>(data), sizeof(data));
+}();
 
 
 QRconSession::QRconSession(QObject* parent) :
@@ -52,18 +58,24 @@ void QRconSession::authenticate()
     m_socket->connectToHost(hostName(), port());
 }
 
-void QRconSession::command(const QString& command)
-{
-    QByteArray packet = makePacket(SERVERDATA_EXECCOMMAND, command);
-    m_socket->write(packet);
-}
-
 void QRconSession::command(QRconCommand* command)
 {
-    m_commands << command;
-    command->commandId = m_id + 1;
+    auto it = std::find_if(m_commands.begin(), m_commands.end(), [command](auto it) {
+        return it == command;
+    });
+
+    if (it == m_commands.end())
+        m_commands << QPointer<QRconCommand>(command);
+
+    quint32 id;
+    QByteArray packet = makePacket(SERVERDATA_EXECCOMMAND, command->command(), &id);
+    command->commandId = id;
     command->clear();
-    this->command(command->command()); // wtf is that construction
+    m_socket->write(packet);
+
+    packet = makePacket(SERVERDATA_RESPONSE_VALUE, QString(), &id);
+    command->verifyId = id;
+    m_socket->write(packet);
 }
 
 void QRconSession::setServerConfig(const QRconServerConfig &config)
@@ -88,7 +100,7 @@ void QRconSession::setPort(quint32 port)
     m_port = port;
 }
 
-void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QString& body)
+void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QByteArray &body)
 {
     if (id == static_cast<qint32>(m_authId)) {
         if (type == SERVERDATA_RESPONSE_VALUE || type == SERVERDATA_AUTH_RESPONSE) {
@@ -102,28 +114,35 @@ void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QString& bod
         qDebug("Authentication failed!");
         emit error(AuthenticationFailed);
     } else if (type == SERVERDATA_RESPONSE_VALUE) {
+        // remove all destroyed commands
+        m_commands.erase(std::remove_if(m_commands.begin(), m_commands.end(), [](auto it) { return it.isNull(); }), m_commands.end());
+
         auto it = std::find_if(m_commands.begin(), m_commands.end(), [id](auto it) {
-            return it->commandId == id;
+            return it->commandId == id || it->verifyId == id;
         });
         
         if (it != m_commands.end()) {
-            (*it)->replyReceived(body);
-            (*it)->finish();
+            if (id == (*it)->verifyId && body == PacketEmpty) { // empty response
+                (*it)->finish();
+            } else {
+                (*it)->replyReceived(QString(body));
+            }
         }
     }
-    
-    Q_UNUSED(body);
 }
 
-QByteArray QRconSession::makePacket(qint32 packetType, const QString& string)
+QByteArray QRconSession::makePacket(qint32 packetType, const QString& string, quint32 *id)
 {
     qint32 length = string.length() + 10;
-    qint32 id = ++m_id;
     qint32 type = packetType;
+
+    m_id += 1;
+    if (id)
+        *id = m_id;
     
     QByteArray packet;
     packet.append(reinterpret_cast<char*>(&length), 4);
-    packet.append(reinterpret_cast<char*>(&id), 4);
+    packet.append(reinterpret_cast<char*>(&m_id), 4);
     packet.append(reinterpret_cast<char*>(&type), 4);
     packet.append(string);
     packet.append('\0').append('\0');
@@ -137,8 +156,7 @@ void QRconSession::authenticateImpl()
     
     connect(m_socket, &QAbstractSocket::disconnected, std::bind(&QRconSession::error, this, Disconnected));
     
-    QByteArray packet = makePacket(SERVERDATA_AUTH, password());
-    m_authId = m_id;
+    QByteArray packet = makePacket(SERVERDATA_AUTH, password(), &m_authId);
     m_socket->write(packet);
 }
 
@@ -164,7 +182,7 @@ void QRconSession::readRcon()
         QByteArray body(m_length - 8, '\0');
         stream.readRawData(body.data(), m_length - 8);
         
-        rconPacketReceived(id, type, QString(body));
+        rconPacketReceived(id, type, body);
         m_length = 0;
     }
 }
