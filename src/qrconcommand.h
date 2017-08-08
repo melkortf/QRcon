@@ -20,7 +20,7 @@
 #ifndef QRCONCOMMAND_H
 #define QRCONCOMMAND_H
 
-#include "qrconexport.h"
+#include "qrcon_export.h"
 #include <QObject>
 
 class QRconSession;
@@ -36,7 +36,7 @@ class QRconSession;
  * \ref QRconSession::command(), there is no simple way to capture the server's
  * response. This class makes it easy to read the reply.
  */
-class __QRconApi__ QRconCommand : public QObject {
+class QRCON_EXPORT QRconCommand : public QObject {
     Q_OBJECT
     friend class QRconSession;
     

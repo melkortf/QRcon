@@ -1,20 +1,5 @@
-﻿project (QRcon)
-cmake_minimum_required (VERSION 3.0 FATAL_ERROR)
-
-# Automatically link Qt executables to qtmain target on Windows
-if (POLICY CMP0020)
-    cmake_policy (SET CMP0020 NEW)
-endif ()
-
-# Double colon in target name means ALIAS or IMPORTED target.
-if (POLICY CMP0028)
-    cmake_policy (SET CMP0028 NEW)
-endif ()
-
-# Disallow use of the LOCATION target property.
-if (POLICY CMP0026)
-    cmake_policy (SET CMP0026 OLD)
-endif ()
+project (QRcon)
+cmake_minimum_required (VERSION 3.7 FATAL_ERROR)
 
 if (UNIX AND NOT APPLE)
     set (LINUX 1)
@@ -39,9 +24,13 @@ endif ()
 
 # set CXX_FLAGS
 if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
-    set (CMAKE_CXX_FLAGS_RELEASE "-DQT_NO_DEBUG -DQT_NO_DEBUG_OUTPUT")
-    set (CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wpedantic -Wextra")
-    set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
+    set (CMAKE_CXX_FLAGS_RELEASE "-DQT_NO_DEBUG -DQT_NO_DEBUG_OUTPUT -DNDEBUG")
+    set (CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -Wall -Wextra -Wpedantic")
+    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined -Wl,--exclude-libs,ALL")
+    else ()
+        set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-undefined,error")
+    endif ()
 elseif (MSVC)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     set (CMAKE_CXX_FLAGS_DEBUG "/W4")
@@ -68,6 +57,7 @@ endif ()
 set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_subdirectory (src)
 

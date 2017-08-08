@@ -1,7 +1,7 @@
 #ifndef QRCONSERVERCONFIG_H
 #define QRCONSERVERCONFIG_H
 
-#include "qrconexport.h"
+#include "qrcon_export.h"
 #include <QMetaType>
 #include <QSharedDataPointer>
 #include <QString>
@@ -15,7 +15,7 @@ class QRconServerConfigData;
  * The \c QRconServerConfig class provides server configuration that can be
  * used with \ref QRconSession as well as serialized.
  */
-class __QRconApi__ QRconServerConfig {
+class QRCON_EXPORT QRconServerConfig {
 public:
     /**
      * Creates an empty server config. \c QRConSession will always fail
@@ -55,7 +55,7 @@ private:
 Q_DECLARE_METATYPE(QRconServerConfig)
 Q_DECLARE_TYPEINFO(QRconServerConfig, Q_MOVABLE_TYPE);
 
-__QRconApi__ QDataStream& operator<<(QDataStream& out, const QRconServerConfig& config);
-__QRconApi__ QDataStream& operator>>(QDataStream& in, QRconServerConfig& config);
+QRCON_EXPORT QDataStream& operator<<(QDataStream& out, const QRconServerConfig& config);
+QRCON_EXPORT QDataStream& operator>>(QDataStream& in, QRconServerConfig& config);
 
 #endif // QRCONSERVERCONFIG_H

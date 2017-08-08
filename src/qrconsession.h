@@ -20,8 +20,8 @@
 #ifndef QRCONSESSION_H
 #define QRCONSESSION_H
 
-#include "qrconexport.h"
 #include "qrconserverconfig.h"
+#include "qrcon_export.h"
 #include <QObject>
 #include <QPointer>
 #include <QTcpSocket>
@@ -35,7 +35,7 @@ class QRconCommand;
  * The \c QRconSession class represents a single RCON session. It starts
  * with authentication and ends when the connection is closed.
  */
-class __QRconApi__ QRconSession : public QObject {
+class QRCON_EXPORT QRconSession : public QObject {
     Q_OBJECT
     
     /**

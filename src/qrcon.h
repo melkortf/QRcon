@@ -26,6 +26,7 @@
  * The QRcon library classes & functions.
  */
 
+#include "qcvarcommand.h"
 #include "qrconcommand.h"
 #include "qrconsession.h"
 
