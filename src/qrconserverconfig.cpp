@@ -4,18 +4,18 @@
 class QRconServerConfigData : public QSharedData {
 public:
     QRconServerConfigData() = default;
-    QRconServerConfigData(const QString& hostName, const QString& password, quint32 port) :
+    QRconServerConfigData(const QString& hostName, const QString& password, quint16 port) :
         hostName(hostName), password(password), port(port) {}
 
     QString hostName;
     QString password;
-    quint32 port = 27015; // most common TF2 server port
+    quint16 port = 27015; // most common source dedicated server port
 };
 
 QRconServerConfig::QRconServerConfig() :
     d(new QRconServerConfigData) {}
 
-QRconServerConfig::QRconServerConfig(const QString &hostName, const QString &password, quint32 port) :
+QRconServerConfig::QRconServerConfig(const QString &hostName, const QString &password, quint16 port) :
     d(new QRconServerConfigData(hostName, password, port)) {}
 
 QRconServerConfig::QRconServerConfig(const QRconServerConfig &other) :
@@ -49,12 +49,12 @@ void QRconServerConfig::setPassword(const QString &password)
     d->password = password;
 }
 
-quint32 QRconServerConfig::port() const
+quint16 QRconServerConfig::port() const
 {
     return d->port;
 }
 
-void QRconServerConfig::setPort(quint32 port)
+void QRconServerConfig::setPort(quint16 port)
 {
     d->port = port;
 }
@@ -68,7 +68,7 @@ QDataStream &operator<<(QDataStream &out, const QRconServerConfig &config)
 QDataStream &operator>>(QDataStream &in, QRconServerConfig &config)
 {
     QString hostName, password;
-    quint32 port;
+    quint16 port;
     in >> hostName;
     in >> password;
     in >> port;

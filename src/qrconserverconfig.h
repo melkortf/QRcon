@@ -2,9 +2,9 @@
 #define QRCONSERVERCONFIG_H
 
 #include "qrcon_export.h"
-#include <QMetaType>
-#include <QSharedDataPointer>
-#include <QString>
+#include <QtCore/QMetaType>
+#include <QtCore/QSharedDataPointer>
+#include <QtCore/QString>
 
 class QRconServerConfigData;
 
@@ -26,7 +26,7 @@ public:
     /**
      * Creates a full server config from the arguments provided.
      */
-    QRconServerConfig(const QString& hostName, const QString& password, quint32 port);
+    QRconServerConfig(const QString& hostName, const QString& password, quint16 port);
 
     /**
      * Creates a copy of \c other with shared underlying data.
@@ -44,8 +44,8 @@ public:
     void setHostName(const QString& hostName);
     QString password() const;
     void setPassword(const QString& password);
-    quint32 port() const;
-    void setPort(quint32 port);
+    quint16 port() const;
+    void setPort(quint16 port);
 
 private:
     QSharedDataPointer<QRconServerConfigData> d;

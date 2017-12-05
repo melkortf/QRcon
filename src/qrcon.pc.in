@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/qrcon
+
+Name: @PROJECT_NAME@
+Description: A Source RCON protocol implementation for the Qt framework
+Version: @qrcon_VERSION@
+
+Requires:
+Libs: -L${libdir} -lqrcon
+Cflags: -I${includedir}

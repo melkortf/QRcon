@@ -95,7 +95,7 @@ void QRconSession::setPassword(const QString& password)
     m_password = password;
 }
 
-void QRconSession::setPort(quint32 port)
+void QRconSession::setPort(quint16 port)
 {
     m_port = port;
 }
@@ -118,11 +118,11 @@ void QRconSession::rconPacketReceived(qint32 id, qint32 type, const QByteArray &
         m_commands.erase(std::remove_if(m_commands.begin(), m_commands.end(), [](auto it) { return it.isNull(); }), m_commands.end());
 
         auto it = std::find_if(m_commands.begin(), m_commands.end(), [id](auto it) {
-            return it->commandId == id || it->verifyId == id;
+            return it->commandId == static_cast<quint32>(id) || it->verifyId == static_cast<quint32>(id);
         });
         
         if (it != m_commands.end()) {
-            if (id == (*it)->verifyId && body == PacketEmpty) { // empty response
+            if (static_cast<quint32>(id) == (*it)->verifyId && body == PacketEmpty) { // empty response
                 (*it)->finish();
             } else {
                 (*it)->replyReceived(QString(body));

@@ -21,7 +21,7 @@
 #define QRCONCOMMAND_H
 
 #include "qrcon_export.h"
-#include <QObject>
+#include <QtCore/QObject>
 
 class QRconSession;
 
@@ -38,7 +38,6 @@ class QRconSession;
  */
 class QRCON_EXPORT QRconCommand : public QObject {
     Q_OBJECT
-    friend class QRconSession;
     
 signals:
     /**
@@ -62,7 +61,9 @@ protected:
     void finish();
     
 private:
-    int commandId, verifyId;
+    friend class QRconSession;
+
+    quint32 commandId, verifyId;
     QString m_command;
     QString m_body;
 

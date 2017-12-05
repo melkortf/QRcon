@@ -54,7 +54,7 @@ class QRCON_EXPORT QRconSession : public QObject {
      * The \c port property specifies the port on which the RCON server is
      * listening. By default it is 27015.
      */
-    Q_PROPERTY(quint32 port READ port WRITE setPort)
+    Q_PROPERTY(quint16 port READ port WRITE setPort)
     
 public:
     /**
@@ -111,8 +111,8 @@ public:
     void setHostName(const QString& hostName);
     const QString& password() const { return m_password; }
     void setPassword(const QString& password);
-    quint32 port() const { return m_port; }
-    void setPort(quint32 port);
+    quint16 port() const { return m_port; }
+    void setPort(quint16 port);
     
 protected:
     virtual void rconPacketReceived(qint32 id, qint32 type, const QByteArray& body);
@@ -128,7 +128,7 @@ private slots:
 private:
     QString m_hostName;
     QString m_password;
-    quint32 m_port = 27015; /* Default port */
+    quint16 m_port = 27015; /* Default port */
     QTcpSocket* m_socket = nullptr;
     quint32 m_id = 0; /* Packet counter */
     quint32 m_authId = 0; /* ID of the auth packet */
