@@ -31,10 +31,6 @@ class QRconSession;
  * 
  * The \c QRconCommand class represents a single RCON command that can be
  * executed during the session.
- * 
- * Although we can execute commands in a simple way, using
- * \ref QRconSession::command(), there is no simple way to capture the server's
- * response. This class makes it easy to read the reply.
  */
 class QRCON_EXPORT QRconCommand : public QObject {
     Q_OBJECT
@@ -49,7 +45,15 @@ signals:
 public:
     explicit QRconCommand(const QString& command, QObject* parent = nullptr);
     
+    /**
+     * The command that is executed.
+     */
     const QString& command() const { return m_command; }
+
+    /**
+     * A response body.
+     * This method returns a null QString unless \ref finished() was already emitted.
+     */
     const QString& body() const { return m_body; }
     
 protected:
@@ -57,11 +61,12 @@ protected:
      * Clears the response body, preparing it for a next execution.
      */
     void clear();
-    void replyReceived(const QString& body);
-    void finish();
     
 private:
     friend class QRconSession;
+
+    void replyReceived(const QString& body);
+    void finish();
 
     quint32 commandId, verifyId;
     QString m_command;

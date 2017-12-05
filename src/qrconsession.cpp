@@ -21,8 +21,6 @@
 #include "qrconcommand.h"
 #include <QtNetwork>
 #include <algorithm>
-#include <cstring>
-#include <functional>
 
 constexpr auto SERVERDATA_AUTH = 3;
 constexpr auto SERVERDATA_EXECCOMMAND = 2;
@@ -40,7 +38,7 @@ QRconSession::QRconSession(QObject* parent) :
     m_socket(new QTcpSocket(this))
 {   
     connect(m_socket, &QAbstractSocket::readyRead, this, &QRconSession::readRcon);
-    connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
+    connect(m_socket, qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::error), this, &QRconSession::handleError);
     connect(m_socket, &QAbstractSocket::connected, this, &QRconSession::authenticateImpl);
 }
 
@@ -153,9 +151,7 @@ QByteArray QRconSession::makePacket(qint32 packetType, const QString& string, qu
 void QRconSession::authenticateImpl()
 {
     qDebug("Using password: %s", qPrintable(password()));
-    
-    connect(m_socket, &QAbstractSocket::disconnected, std::bind(&QRconSession::error, this, Disconnected));
-    
+
     QByteArray packet = makePacket(SERVERDATA_AUTH, password(), &m_authId);
     m_socket->write(packet);
 }

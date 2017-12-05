@@ -22,9 +22,9 @@
 
 #include "qrconserverconfig.h"
 #include "qrcon_export.h"
-#include <QObject>
-#include <QPointer>
-#include <QTcpSocket>
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
+#include <QtNetwork/QTcpSocket>
 
 class QRconCommand;
 
@@ -62,10 +62,11 @@ public:
      * the RCON session.
      */
     enum Error {
-        AuthenticationFailed /**< Indicates the wrong RCON authentication */,
-        Disconnected /**< The connection with RCON host is lost */,
-        Other /**< Other, internal error */
+        AuthenticationFailed    /**< Indicates the wrong RCON authentication */,
+        Disconnected            /**< The connection with RCON host is lost */,
+        Other                   /**< Other, internal error */
     };
+    Q_ENUM(Error)
     
 signals:
     /**
@@ -136,7 +137,6 @@ private:
     QList<QPointer<QRconCommand>> m_commands; /* List of pending commands */
     int m_length = 0; /* Used to read RCON packets */
     QString m_body;
-    
     
 }; /** @} */
 

@@ -21,8 +21,15 @@ set (qrcon_HEADERS
     qrcon.h
 )
 
-add_library (qrcon SHARED ${qrcon_SOURCES} ${qrcon_HEADERS})
-target_link_libraries (qrcon Qt5::Core Qt5::Network)
+add_library (qrcon SHARED
+    ${qrcon_SOURCES}
+    ${qrcon_HEADERS}
+)
+
+target_link_libraries (qrcon
+    PRIVATE Qt5::Core Qt5::Network
+)
+
 set_target_properties (qrcon PROPERTIES
     CXX_VISIBILITY_PRESET hidden
     VERSION ${qrcon_VERSION}
@@ -35,7 +42,7 @@ generate_export_header(qrcon)
 
 include (GNUInstallDirs)
 install (TARGETS qrcon
-    EXPORT qrcon
+    EXPORT qrcon-config
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qrcon
 )
@@ -46,4 +53,6 @@ install (FILES
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig
 )
 
-install (EXPORT qrcon DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/qrcon)
+install (EXPORT qrcon-config
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/qrcon/cmake
+)

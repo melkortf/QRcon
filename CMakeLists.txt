@@ -1,5 +1,5 @@
-project (QRcon)
 cmake_minimum_required (VERSION 3.7 FATAL_ERROR)
+project (QRcon)
 
 if (UNIX AND NOT APPLE)
     set (LINUX 1)
@@ -37,7 +37,7 @@ elseif (MSVC)
     set (CMAKE_CXX_FLAGS_RELEASE "/DQT_NO_DEBUG /DQT_NO_DEBUG_OUTPUT")
 endif ()
 
-set (CMAKE_CXX_STANDARD "14")
+set (CMAKE_CXX_STANDARD 14)
 
 # find version
 if (NOT qrcon_VERSION)
